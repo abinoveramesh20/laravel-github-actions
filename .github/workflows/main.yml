@@ -1,10 +1,7 @@
-name: Docker Build & Push
+name: Docker Build
 
 on:
   push:
-    branches:
-      - main
-  pull_request:
     branches:
       - main
 
@@ -13,15 +10,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
+    - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Build and push Docker image
-      uses: docker/build-push-action@v2
+    - name: Build and tag Docker images
+      run: |
+        docker-compose -f docker-compose.yml build
+        docker build -t ubuntu/php-app ./php
+
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v1
       with:
-        context: ./docker
-        file: ./docker/docker-compose.yml
-        push: true
-      env:
-        DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Push Docker images
+      run: |
+        docker-compose -f docker-compose.yml push
+        docker push yourusername/php-app
