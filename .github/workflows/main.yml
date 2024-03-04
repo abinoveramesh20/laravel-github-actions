@@ -1,4 +1,4 @@
-name: Deploy
+name: Deploy PHP Application
 
 on:
   push:
@@ -10,8 +10,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Start Docker services
-        run: docker-compose -f docker-compose.yml up -d
+      - name: Run PHP Server
+        run: php -S localhost:8000 &
+
+      - name: Wait for PHP Server
+        run: sleep 3
+
+      - name: Test PHP Application
+        run: curl http://localhost:8000
