@@ -1,4 +1,4 @@
-name: Docker Build
+name: Deploy
 
 on:
   push:
@@ -6,15 +6,12 @@ on:
       - main
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Build and run Docker Compose
-        run: |
-          cd docker
-          docker-compose -f docker-compose.yml build
-          docker-compose -f docker-compose.yml up -d
+      - name: Start Docker services
+        run: docker-compose -f docker-compose.yml up -d
