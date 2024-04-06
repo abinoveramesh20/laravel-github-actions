@@ -1,23 +1,27 @@
-name: Deploy PHP Application
+name: CICD
 
 on:
   push:
-    branches:
-      - main
+    branches: [ Branch ]
 
 jobs:
   deploy:
+    name: Deploy 
     runs-on: ubuntu-latest
-
+    if: github.ref == 'refs/heads/development'
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
+      - name: Composer install
+        run: composer install
 
-      - name: Run PHP Server
-        run: php -S localhost:8000 &
-
-      - name: Wait for PHP Server
-        run: sleep 3
-
-      - name: Test PHP Application
-        run: curl http://localhost:8000
+      - name: Deploy to development server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          port: ${{ secrets.PORT }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: | 
+           cd /var/www/html/project
+           git pull origin branch
+           composer install
